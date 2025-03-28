@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Video Downloader</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="container max-w-md bg-white rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-2xl">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
+            Instagram Video Downloader
+        </h1>
+
+        <div id="inputSection" class="space-y-4">
+            <input 
+                type="text" 
+                id="videoUrl"
+                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                placeholder="Paste Instagram URL disini..."
+            >
+            
+            <button 
+                onclick="downloadVideo()"
+                class="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg hover:from-purple-600 hover:to-blue-500 transition-all transform hover:scale-105 shadow-md"
+            >
+                📥 Download Video
+            </button>
+        </div>
+
+        <div id="loading" class="text-center my-6 hidden">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-gray-500 mt-2 animate-pulse">Memproses permintaan...</p>
+        </div>
+
+        <div id="result" class="mt-6 space-y-4"></div>
+    </div>
+
+    <!-- Bootstrap Modal untuk Video Popup -->
+    <div class="modal fade" id="videoModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-0">
+                    <button 
+                        type="button" 
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                    ></button>
+                </div>
+                <div class="modal-body p-0">
+                    <video 
+                        id="popupVideo" 
+                        class="w-100" 
+                        controls
+                        controlsList="nodownload"
+                    ></video>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src=""></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
