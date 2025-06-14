@@ -1,83 +1,118 @@
-async function downloadVideo() {
-  const videoUrl = document.getElementById('videoUrl').value.trim();
-  const resultDiv = document.getElementById('result');
-  const loading = document.getElementById('loading');
-  
-  // Reset state
-  resultDiv.innerHTML = '';
-  loading.classList.remove('hidden');
-  
-  if (!videoUrl) {
-    showError('Silakan masukkan URL video Instagram');
-    return;
-  }
-  
-  try {
-    const response = await axios.get(
-      `https://api.allorigins.win/get?url=${
+        // Elements
+        const videoUrlInput = document.getElementById('videoUrl');
+        const resultDiv = document.getElementById('result');
+        const loadingDiv = document.getElementById('loading');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const errorContainer = document.getElementById('errorContainer');
+        const errorTitle = document.getElementById('errorTitle');
+        const errorMessage = document.getElementById('errorMessage');
+        const resultVideo = document.getElementById('resultVideo');
+        const hdDownload = document.getElementById('hdDownload');
+        
+        // Reset UI state
+        function resetUI() {
+          resultDiv.style.display = 'none';
+          errorContainer.style.display = 'none';
+          loadingDiv.style.display = 'none';
+          downloadBtn.disabled = false;
+        }
+        
+        // Show loading state
+        function showLoading() {
+          resetUI();
+          loadingDiv.style.display = 'block';
+          downloadBtn.disabled = true;
+        }
+        
+        // Show error message
+        function showError(title, message) {
+          resetUI();
+          errorTitle.textContent = title;
+          errorMessage.textContent = message;
+          errorContainer.style.display = 'block';
+        }
+        
+        // Show success result
+        function showVideo(url) {
+          resetUI();
+          
+          // Set video source
+          resultVideo.src = url;
+          
+          // Set download link
+          hdDownload.href = url;
+          
+          // Show the result container
+          resultDiv.style.display = 'block';
+          
+          // Scroll to results
+          resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Copy link to clipboard
+        function copyLink() {
+          if (resultVideo.src) {
+            navigator.clipboard.writeText(resultVideo.src)
+              .then(() => {
+                alert('Link copied to clipboard!');
+              })
+              .catch(err => {
+                showError('Clipboard Error', 'Failed to copy link to clipboard');
+              });
+          } else {
+            showError('Copy Error', 'No video link available to copy');
+          }
+        }
+        
+        // Main download function
+        async function downloadVideo() {
+          const videoUrl = videoUrlInput.value.trim();
+          
+          // Show loading state
+          showLoading();
+          
+          if (!videoUrl) {
+            showError('Input Error', 'Please enter an Instagram URL');
+            return;
+          }
+          
+          // Validate Instagram URL
+          if (!videoUrl.includes('instagram.com/')) {
+            showError('URL Error', 'Please enter a valid Instagram URL');
+            return;
+          }
+          
+          try {
+            const response = await axios.get(
+              `https://api.allorigins.win/get?url=${
                         encodeURIComponent(
                             `https://api.im-rerezz.xyz/api/dl/instagram?url=${
                                 encodeURIComponent(videoUrl)
                             }`
                         )
                     }`
-    );
-    
-    const data = JSON.parse(response.data.contents);
-    
-    if (data.status && Array.isArray(data.data)) {
-      const videoItem = data.data.find(item => item.title === "Download Video");
-      
-      if (videoItem) {
-        showVideo(videoItem.url);
-      } else {
-        showError('Tidak ada video yang ditemukan');
-      }
-    } else {
-      showError(data.message || 'URL tidak valid');
-    }
-  } catch (error) {
-    showError(error.message || 'Terjadi kesalahan');
-  } finally {
-    loading.classList.add('hidden');
-  }
-}
-
-function showVideo(url) {
-  const resultDiv = document.getElementById('result');
-  resultDiv.innerHTML = `
-                <div class="card border-0 shadow-sm">
-                    <video 
-                        class="card-img-top rounded-top-lg cursor-pointer hover:shadow-lg transition"
-                        onclick="showModal('${url}')"
-                    >
-                        <source src="${url}" type="video/mp4">
-                    </video>
-                    <div class="card-body text-center">
-                        <a 
-                            href="${url}" 
-                            download
-                            class="btn btn-danger px-5 py-2 rounded-pill shadow-sm"
-                        >
-                            ⬇️ Download Sekarang
-                        </a>
-                    </div>
-                </div>
-            `;
-}
-
-function showModal(url) {
-  const video = document.getElementById('popupVideo');
-  video.src = url;
-  new bootstrap.Modal(document.getElementById('videoModal')).show();
-}
-
-function showError(message) {
-  const resultDiv = document.getElementById('result');
-  resultDiv.innerHTML = `
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `;
-}
+            );
+            
+            const data = JSON.parse(response.data.contents);
+            
+            if (data.status && Array.isArray(data.data)) {
+              const videoItem = data.data.find(item => item.title === "Download Video");
+              
+              if (videoItem) {
+                showVideo(videoItem.url);
+              } else {
+                showError('Video Not Found', 'No downloadable video found in this post');
+              }
+            } else {
+              showError('API Error', data.message || 'Invalid response from server');
+            }
+          } catch (error) {
+            showError('Network Error', error.message || 'An error occurred while processing your request');
+          }
+        }
+        
+        // Initialize with sample URL
+        window.onload = function() {
+          // Set a sample Instagram URL for demo
+          videoUrlInput.value = "";
+        }
